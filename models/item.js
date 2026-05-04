@@ -22,8 +22,10 @@ module.exports = (sequelize, DataTypes) => {
     image:{
     type: DataTypes.STRING,
      get() {
-      const rawValue = this.getDataValue('username');
-      return rawValue ? rawValue.toUpperCase() : null;
+      //getter : memanipulasi data untuk responsenya
+      const rawValue = this.getDataValue('image');
+      // image yg di cb cmn filename, di resp jadi link yang bisa dibuka/tampilin gambarnya
+      return rawValue ? `http://localhost:3000/uploads/${rawValue}` : null;
     },
   } 
   }, {

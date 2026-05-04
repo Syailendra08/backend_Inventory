@@ -10,5 +10,8 @@ const itemController = require('../controllers/item.controller')
 // single(image) : ambil 1 file yg diuoload di inputan image
 router.post('/', upload.single('image'), itemController.createItem);
 router.get('/', itemController.getItem);
-
+//path dinamis pake (:) buat ambil req.params
+router.get('/:id', itemController.showItem);
+router.put('/:id', upload.single('image'), itemController.updateItem);
+router.delete('/:id', itemController.deleteItem);
 module.exports = router
