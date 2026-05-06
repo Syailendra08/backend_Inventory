@@ -57,22 +57,34 @@ module.exports = {
             // req query: ambil params di postman / ambil data acuan untuk search/sort
             /// sortBy: ngurutin berdasarkan field apa
             //order: ASC/DESC, opsi pengurutnan
-            const { name, sortBy, order } = req.query;
+            const { name, sortBy, order, page, limit  } = req.query;
+            const offset = (Number(page)-1) * Number(limit); 
 
-            const items = await Item.findAll({
+            const {count, rows} = await Item.findAndCountAll({
+                offset: Number(offset),
+                limit: Number(limit),
                 where: name ? {
                     name: {
                         [Op.like]: `%${name}%` // mencari yg mirip
                     }
-                } : {},
+                } : {}, 
                 // kalau di params pastikan ada sortBy dan order, jalanin penurutan, klo gaada pake default, misal sortBy 'stock order 'DESC'
                 order: sortBy && order ? [
                     [sortBy, order]
-                ] : [] // taro berdasarkan field name di db dari name req.query
+                ] : [] 
+                // taro berdasarkan field name di db dari name req.query
             });
 
+            const formatPagination = {
+                data: rows, // data yang dimunculkan
+                limit: limit,
+                rows: (Number(offset)+1) + "-" + (Number(offset)+Number(rows.length)) ,
+                // munculin angka 1-20 atau 21-30 sesuai yg diambil
+                total: count,// jumlah data keseluruhan
+                page: page, //sedang di halaman ke berapa
+            }
 
-            return res.status(200).json(response(200, "success", items));
+            return res.status(200).json(response(200, "success", formatPagination));
         } catch (error) {
             return res.status(500).json(response(500, "Server Error", error.message))
 

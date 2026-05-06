@@ -6,6 +6,8 @@ const db = require("./models")
 const methodOverride = require('method-override')
 const itemRoutes = require('./routes/item.routes')
 const loanRoutes = require('./routes/loan.routes')
+const loginRoutes = require('./routes/login.routes')
+const {checkToken} = require('./middlewares/auth')
 // cek koneksi model - migraiton - proyek sequelize
 db.sequelize.authenticate()
 .then(() => console.log("Database (model) terkoneksi!"))
@@ -15,8 +17,9 @@ db.sequelize.authenticate()
 app.use(express.json());
 app.use(methodOverride("_method"));  // mengijinkan req.body format json
 app.use('/uploads', express.static('uploads')); // agar gambar yg disimpan di folder uploads dibolehkan untuk diambil/dimunculkan di browser (FE)
-app.use('/items', itemRoutes);
-app.use('/loans', loanRoutes);  // mendaftarkan routes dan prefixnya 
+app.use('/items', checkToken, itemRoutes);
+app.use('/loans', checkToken, loanRoutes);  // mendaftarkan routes dan prefixnya 
+app.use('/', loginRoutes);
 // menggunaan _method PUT, PATCH, DELETE
 
 app.get('/', (req, res) => {
